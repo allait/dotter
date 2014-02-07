@@ -2,7 +2,7 @@ import argparse
 import logging
 import os
 
-from .client import GithubCachedClient
+from .client import GithubCachedClient, GithubClient
 from .search import get_dotfiles, SEARCH_QUERIES
 
 
@@ -18,8 +18,12 @@ def parse_args():
 def main():
     args = parse_args()
 
-    token = open(args.token_file).read().strip()
-    client = GithubCachedClient(cache_path=args.cache_path, token=token)
+    token = open(args.token_file).read().strip() if args.token_file else None
+
+    if args.cache_path:
+        client = GithubCachedClient(cache_path=args.cache_path, token=token)
+    else:
+        client = GithubClient(token=token)
 
     dots = get_dotfiles(client, queries=SEARCH_QUERIES)
 
